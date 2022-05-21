@@ -137,7 +137,7 @@ bool Socket::SetTcpNoDelay(bool enable) const {
   return true;
 }
 
-bool Socket::SetSoLinger(bool enable, int seconds) {
+bool Socket::SetSoLinger(bool enable, int seconds) const {
   if (fd_ < 0) {
     HTTPCOMM_ERROR("bad fd [%d]", fd_);
     return false;
@@ -162,8 +162,87 @@ bool Socket::SetTcpKeepAlive(int idleTime, int keepInterval, int cnt) const {
   }
 
   if (setsockopt(fd_, SOL_TCP, TCP_KEEPIDLE, &idleTime, sizeof(idleTime)) < 0) {
-    HTTPCOMM
+    HTTPCOMM_ERROR("setsockopt TCP_KEEPIDLE failed on fd [%d] [%s]", fd_,
+                    ErrnoDescription::GetDescription(errno));
+    return false;
   }
+  if (setsockopt(fd_, SOL_TCP, TCP_KEEPINTVL, &keepInterval, sizeof(keepInterval)) < 0) {
+    HTTPCOMM_ERROR("setsockopt TCP_KEEPINTVL failed on fd [%d] [%s]", fd_,
+                    ErrnoDescription::GetDescription(errno));
+    return false;
+  }
+  if (setsockopt(fd_, SOL_TCP, TCP_KEEPCNT, &cnt, sizeof(cnt)) < 0) {
+    HTTPCOMM_ERROR("setsockopt TCP_KEEPCNT failed on fd [%d] [%s]", fd_,
+                    ErrnoDescription::GetDescription(errno));
+    return false;
+  }
+  return true;
+}
+
+bool Socket::SetSoRcvBuf(int buffSize) const {
+  if (fd_ < 0) {
+    HTTPCOMM_ERROR("bad fd [%d]", fd_);
+    return false;
+  }
+
+  if (setsockopt(fd_, SOL_SOCKET, SO_RCVBUF, &buffSize, sizeof(buffSize)) < 0) {
+    HTTPCOMM_ERROR("setsockopt failed on fd [%d] [%s]", fd_,
+                    ErrnoDescription::GetDescription(errno));
+    return false;
+  }
+  return true;
+}
+
+bool Socket::SetSoSndBuf(int buffSize) const {
+  if (fd_ < 0) {
+    HTTPCOMM_ERROR("bad fd [%d]", fd_);
+    return false;
+  }
+
+  if (setsockopt(fd_, SOL_SOCKET, SO_SNDBUF, &buffSize, sizeof(buffSize)) < 0) {
+    HTTPCOMM_ERROR("setsockopt failed on fd [%d] [%s]", fd_,
+                    ErrnoDescription::GetDescription(errno));
+    return false;
+  }
+  return true;
+}
+
+bool Socket::SetOption(int option, const void* value, size_t len) const {
+  if (fd_ < 0) {
+    HTTPCOMM_ERROR("bad fd [%d]", fd_);
+    return false;
+  }
+
+  if (setsockopt(fd_, SOL_SOCKET, option, value, len) < 0) {
+    HTTPCOMM_ERROR("setsockopt failed on fd [%d] [%s]", fd_,
+                    ErrnoDescription::GetDescription(errno));
+    return false;
+  }
+  return true;
+}
+
+bool Socket::GetSoError(int* code) const {
+  if (fd_ < 0) {
+    HTTPCOMM_ERROR("bad fd [%d]", fd_);
+    return false;
+  }
+
+  socklen_t codeLen = sizeof(*code);
+  if (getsockopt(fd_, SOL_SOCKET, SO_ERROR, code, &codeLen) < 0) {
+    HTTPCOMM_ERROR("getsockopt failed on fd [%d] [%s]", fd_,
+                    ErrnoDescription::GetDescription(errno));
+    return false;
+  }
+  if (codeLen != sizeof(*code)) {
+    HTTPCOMM_ERROR("result size not match");
+    return false;
+  }
+  return true;
+}
+
+
+bool Socket::Free() {
+  delete this;
 }
 
 HTTPCOMM_NAMESPACE_END
