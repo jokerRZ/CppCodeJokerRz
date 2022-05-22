@@ -21,7 +21,7 @@ public:
     return local_port_;
   }
 
-private:
+protected:
   in_addr_t local_addr_;
   uint16_t local_port_;
 
