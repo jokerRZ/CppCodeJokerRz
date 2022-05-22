@@ -4,21 +4,15 @@
 
 HTTPCOMM_NAMESPACE_BEGIN
 
-class TcpClinetSocket : public TcpSocket {
-public:
+class TcpServerSocket : public TcpSocket {
+protected:
   friend class SocketFactory;
 
-  TcpClientSocket(in_addr_t peerAddr, uint16_t peerPort,
+  TcpServerSocket(int fd, in_addr_t peerAddr, uint16_t peerAddr,
                   in_addr_t localAddr, uint16_t localPort);
-
-  virtual ~TcpClientSocket();
+  virtual ~TcpServerSocket();
 
 public:
-  // 0 -- connected
-  // 1 -- connecting
-  // -1 -- error
-  int Connect() const;
-
   in_addr_t GetPeerAddr() const {
     return peer_addr_;
   }
@@ -27,11 +21,11 @@ public:
     return peer_port_;
   }
 
-protected:
+private:
   in_addr_t peer_addr_;
   uint16_t peer_port_;
 
-  HTTPCOMM_DISABLE_COPY_ASSIGN(TcpClientSocket);
+  HTTPCOMM_DISABLE_COPY_ASSIGN(TcpServerSocket);
 };
 
 HTTPCOMM_NAMESPACE_END
