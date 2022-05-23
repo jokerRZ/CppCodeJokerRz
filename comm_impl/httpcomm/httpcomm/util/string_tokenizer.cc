@@ -19,7 +19,30 @@ size_t StringTokenizer::Tokenize(const std::string& str, const std::string& sep,
 }
 
 void StringTokenizer::AddToken(const std::string& token, int opt) {
-  
+
+  size_t token_count = tokens_.size();
+  size_t length = token.size();
+  if (opt & TOKEN_LEAVE_AS) {
+    if (!(opt & TOKEN_IGNORE_EMPTY)) {
+      tokens_.push_back(token);
+    } else if (length > 0) {
+      tokens_.push_back(token);
+    }
+  } else if (opt & TOKEN_TRIM) {
+    size_t n = 0;
+    while (n < length && IsSpace(token[n])) {
+      ++n;
+    }
+    size_t n2 = length - 1;
+    while (n2 >= n && IsSpace(token[n2])) {
+      --n2;
+    }
+    if (n2 >= n) {
+      tokens_.push_back(token.substr(n, n2 - n + 1));
+    } else if (!(opt & TOKEN_IGNORE_EMPTY)) {
+      tokens_.push_back("");
+    }
+  } else 
 }
 
 HTTPCOMM_NAMESPACE_END

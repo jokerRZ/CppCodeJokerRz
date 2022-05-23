@@ -41,7 +41,6 @@ private:
   bool IsSpace(char ch) const { return (ch > 0 && std::isspace(ch)); }
 
   void AddToken(const std::string& token, int opt);
-
 private:
   TokenVector tokens_;
 
