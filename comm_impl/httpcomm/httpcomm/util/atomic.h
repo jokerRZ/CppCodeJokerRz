@@ -17,7 +17,7 @@ public:
 
   T Get() const { return value_; }
 
-  T AddAndFetch { return __sync_add_and_fetch(&value_, x); }
+  T AddAndFetch(T x) { return __sync_add_and_fetch(&value_, x); }
 
   bool CompareAndSet(T old_val, T new_val) {
     return __sync_bool_compare_and_set(&value_, old_val, new_val);
