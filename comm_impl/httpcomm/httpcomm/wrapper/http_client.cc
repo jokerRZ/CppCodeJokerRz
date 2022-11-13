@@ -35,7 +35,21 @@ public:
     return mHasResponse;
   }
 
-  void SetResponse(HttpResponsePacket)
+  void SetResponse(HttpResponsePacket* resp) {
+    ScopedLock(mMutex);
+
+  }
+
+  std::string HttpVersionToString(HttpVersion version) const {
+    switch(version) {
+    case HV_10:
+      return "HTTP/1.0";
+    case HV_11:
+      return "HTTP/1.1";
+    default:
+      return "";
+    }
+  }
 private:
   mutable Mutex mMutex;
   mutable Cond mCond;
