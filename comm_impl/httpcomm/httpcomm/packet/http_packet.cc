@@ -44,9 +44,24 @@ BuiltinHttpStatus::Status BuiltinHttpStatus::mStatus[] = {
   {301, "Moved Permanently"},
   {302, "Moved Temorarily"},
   {303, "See Other"},
-  {304, "Not Modified"}
+  {304, "Not Modified"},
+  {307, "Temporary Redirect"},
+  {400, "BadRequest"},
+  {401, "Unauthoried"},
+  {402, "Payment Required"},
+  {403, "Forbidden"},
+  {404, "Not Found"},
+  {405, "Not Allowed"}
 }
 
 } // namespace
+
+HttpPacket::HttpPacket() : mVersion(HV_NONE),
+                           mSerialNumber(0),
+                           mIsKeepAlive(false) {}
+
+HttpPacket::~HttpPacket() {}
+
+
 
 HTTPCOMM_NAMESPACE_END
