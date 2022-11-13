@@ -2,15 +2,18 @@
 
 #include <unistd.h>
 #include <errno.h>
+#include <string.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 
 #inlcude <cstdint>
 #include <cstddef>
+#include <cctype>
 
 #include <map>
 #include <string>
 #include <functional>
+#include <algorithm>
 #include <utility>
 #include <vector>
 
