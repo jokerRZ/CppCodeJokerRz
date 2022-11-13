@@ -8,7 +8,7 @@ class Packet {
 protected:
   Packet();
 
-  virtual Packet();
+  virtual ~Packet();
 
 public:
   virtual void Free() = 0;
