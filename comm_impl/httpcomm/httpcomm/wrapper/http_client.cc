@@ -14,7 +14,7 @@ public:
   }
 
   bool GetAndSwap(Response* resp, std::string* errorMsg) {
-    ScopedLock(mMutex);
+    ScopedLock lock(mMutex);
     while (!mHasError && !mHasResponse) {
       mCond.Wait();
     }
@@ -36,8 +36,36 @@ public:
   }
 
   void SetResponse(HttpResponsePacket* resp) {
-    ScopedLock(mMutex);
+    ScopedLock lock(mMutex);
+    mResponse._version = HttpVersionToString(resp->GetVersion());
+    mResponse._headers = resp->GetHeaderMap();
+    mResponse._statusCode = resp->GetStatusCode();
+    mResponse._status = resp->GetStatus();
+    const std::vector<char>& body = resp->GetBody();
+    if (!body.empty()) {
+      mResponse._body.assign(&body[0], body.size());
+    }
+    mHasResponse = true;
+    mCond.Signal();
+    if (mHandler) {
+      mHandler(mResponse, mErrorMsg);
+    }
 
+  }
+
+  void SetError(const std::string& errorMsg) {
+    ScopedLock lock(mMutex);
+    mHasError = True;
+    mErrorMsg = errorMsg;
+    mCond.Signal();
+    if (mHandler) {
+      mHandler(mResponse, mErrorMsg);
+    }
+  }
+
+  void SetResponseHandler(const ResponseHandler& handler) {
+    ScopedLock lock(mMutex);
+    mHandler = handler;
   }
 
   std::string HttpVersionToString(HttpVersion version) const {
@@ -59,5 +87,9 @@ private:
   bool mHasError;
   ResponseHandler mHandler;
 };
+
+namespace {
+
+} // namespace
 
 HTTPCOMM_NAMESPACE_END
