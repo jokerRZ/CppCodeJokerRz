@@ -137,6 +137,6 @@ class HttpPacketFactory {
 public:
   static HttpResponsePacket* CreateResponse();
   static HttpRequestPacket* CreateRequest();
-}
+};
 
 HTTPCOMM_NAMESPACE_END

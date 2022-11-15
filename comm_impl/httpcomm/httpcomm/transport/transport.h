@@ -11,6 +11,15 @@ class Thread;
 
 class Transport {
 public:
+  struct Config {
+    bool _isolateAcceptThread;
+    bool _closeExec;
+    bool _timeCache;
+    uint32_t _rcvBufSize;
+    uint32_t _sndBufSize;
+    uint32_t _threadNum;
+    
+  };
 };
 
 HTTPCOMM_NAMESPACE_END

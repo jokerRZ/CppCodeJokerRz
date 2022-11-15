@@ -16,6 +16,7 @@
 #include <algorithm>
 #include <utility>
 #include <vector>
+#include <memory>
 
 #include <httpcomm/util/define.h>
 #include <httpcomm/util/logger.h>

@@ -7,9 +7,9 @@ HTTPCOMM_NAMESPACE_BEGIN
 class Packet;
 class PacketEncoder {
 protected:
-  PacketEncoder();
+  PacketEncoder() {}
 
-  virtual ~PacketEncoder();
+  virtual ~PacketEncoder() {}
 
 public:
   virtual bool Encode(const Packet& packet, ByteBuffer* buffer) = 0;
