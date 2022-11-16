@@ -86,10 +86,69 @@ bool HttpRequestPacketEncoder::Encode(const Packet& packet, ByteBuffer* buffer) 
     } else {
       // keep alive user's response to remove close header
     }
-  } else if 
+  } else if (version == HV_10) {
+    if (requestPacket->GetIsKeepAlive()) {
+      if (headerMap.find(CONNECTION) == headerMap.end()) {
+        str += KEEPALIVE_HEADER;
+      } else {
+        // user's response to add keep-alive header
+      }
+    } else {
+      // user's response to remove keep-alive header
+    }
+  }
 
+  for (auto iter = headerMap.begin(); iter != headerMap.end(); ++iter) {
+    str += iter->first + ": " + iter->second + "\r\n";
+  }
 
+  auto const& body = requestPacket->GetBody();
+  if (!body.empty()) {
+    if (headerMap.find(CONTENT_LENGTH) == headerMap.end()) {
+      str += CONTENT_LENGTH + ": " + body.size() + "\r\n";
+    }
+  }
+  str += "\r\n";
+
+  buffer->Append(str.c_str(), str.size());
+  if (!body.empty()) {
+    buffer->Append(&body[0], body.size());
+  }
+  return true;
 }
 
+void HttpRequestPacketEncoder::Free() {
+  delete this;
+}
+
+HttpResponsePacketEncoder::HttpResponsePacketEncoder() {}
+
+HttpResponsePacketEncoder::~HttpResponsePacketEncoder() {}
+
+bool HttpResponsePacketEncoder::Encode(const Packet& packet, ByteBuffer* buff) {
+  if (!buffer) return false;
+
+  const HttpResponsePacket* responsePacket = dynamic_cast<const HttpResponsePacket*>(&packet);
+  if (!responsePacket) {
+    HTTPCOMM_ERROR("bad response packet");
+    return false;
+  }
+
+  std::string str;
+  HttpVersion version = responsePacket->GetVersion();
+  switch (version) {
+  case HV_10:
+    str += "HTTP/1.0 ";
+    break;
+  case HV_11:
+    str += "HTTP/1.1 ";
+    break;
+  default:
+    HTTPCOMM_ERROR("version [%d] is not supported", version);
+    return false;
+  }
+
+  int statusCode = responsePacket->
+}
 
 HTTPCOMM_NAMESPACE_END
