@@ -75,7 +75,18 @@ bool HttpRequestPacketEncoder::Encode(const Packet& packet, ByteBuffer* buffer) 
   }
 
   const HeaderMap& headerMap = requestPacket->GetHeaderMap();
-  if (version )
+  if (version == HV_11) {
+    if (!requestPacket->GetIsKeepAlive()) {
+      // user's response to add close header when connection close
+      if (headerMap.find(CONNECTION) == headerMap.end()) {
+        str += CONNECTION_CLOSE;
+      } else {
+        // user's response to add close header
+      }
+    } else {
+      // keep alive user's response to remove close header
+    }
+  } else if 
 
 
 }
