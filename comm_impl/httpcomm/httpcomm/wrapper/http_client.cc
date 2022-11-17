@@ -90,7 +90,7 @@ private:
 
 namespace {
 
-class HttpUserData 
+class HttpUserData : public UserData
 } // namespace
 
 HTTPCOMM_NAMESPACE_END

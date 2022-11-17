@@ -105,7 +105,7 @@ bool HttpRequestPacketEncoder::Encode(const Packet& packet, ByteBuffer* buffer) 
   auto const& body = requestPacket->GetBody();
   if (!body.empty()) {
     if (headerMap.find(CONTENT_LENGTH) == headerMap.end()) {
-      str += CONTENT_LENGTH + ": " + body.size() + "\r\n";
+      str += CONTENT_LENGTH + ": " + std::to_string(body.size()) + "\r\n";
     }
   }
   str += "\r\n";
@@ -148,7 +148,62 @@ bool HttpResponsePacketEncoder::Encode(const Packet& packet, ByteBuffer* buff) {
     return false;
   }
 
-  int statusCode = responsePacket->
+  int statusCode = responsePacket->GetStatusCode();
+  if (statusCode < 0) {
+    HTTPCOMM_ERROR("bad status [%d]", statusCode);
+    return false;
+  }
+
+  auto const& status = responsePacket->GetStatus();
+  if (status.empty()) {
+    HTTPCOMM_ERROR("status is empty");
+    return false;
+  }
+
+  str += std::to_string(statusCode) + " " + status + "\r\n";
+
+  auto const& headerMap = responsePacket->GetHeader();
+  if (version == HV_11) {
+    if (!responsePacket->GetIsKeepAlive()) {
+      if (headerMap.find(CONNECTION) == headerMap.end()) {
+        str += CONECTION_CLOSE;
+      } else {
+        // user's response to add close header
+      }
+    } else {
+      // user's response to remove close header
+    }
+  } else if (version == HV_10) {
+    if (responsePacket->GetIsKeepAlive()) {
+      if (headerMap.find(CONNECTION) == headerMap.end()) {
+        str += KEEPALIVE_HEADER;
+      } else {
+        // user's response to add keep-alive header
+      }
+    } else {
+      // user's response to response to remove keep-alive header
+    }
+  }
+
+  for (HeaderMapConstIter iter = headMap.begin(); iter != headerMap.end(); ++iter) {
+    str += iter->first + ": " + iter->second + "\r\n";
+  }
+
+  auto const& body = responsePacket->GetBody();
+  if (headerMap->find(CONTENT_LENGTH) == headerMap.end()) {
+    str += CONTENT_LENGTH + ": " + std::to_string(body.size());
+  }
+  str += "\r\n";
+
+  buffer->Append(str.c_str(); str.size());
+  if (!body.empty()) {
+    buffer->Append(&body[0], body.size());
+  }
+  return true;
+}
+
+void HttpResponsePacketEncoder::Free() {
+  delete this;
 }
 
 HTTPCOMM_NAMESPACE_END
