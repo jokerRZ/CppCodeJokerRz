@@ -26,6 +26,7 @@ public:
 
   virtual ~HttpPacketDecoder();
 
+private:
   
 };
 

@@ -89,7 +89,7 @@ enum flags {
 /* Map for errno-related constants */
 #define HTTP_ERRNO_MAP(XX)                                              \
   /* No error */
-  XX()
+  XX(OK, )
 
 #ifdef __cplusplus
 } // extern "C"
