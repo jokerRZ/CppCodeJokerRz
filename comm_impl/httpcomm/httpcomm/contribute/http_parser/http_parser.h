@@ -140,8 +140,61 @@ enum http_errno {
 #define HTTP_PARSER_ERRNO   ((enum http_errno) (p)->http_errno)
 
 struct http_parser {
-  
-}
+  /** PRIVATE **/
+  unsigned int type : 2;            /* enum http_parser_type */
+  unsigned int flags : 7;           /* F_* values from 'flags' enum; semi-public */
+  unsigned int state : 7;           /* enum state from http_parser.c */
+  unsigned int header_state : 8;    /* enum header_state from http_parser,c */
+  unsigned int index : 8;           /* index into current matcher */
+
+  uint32_t nread;                   /* bytes read in various scenarios */
+  uint64_t content_length;          /* bytes in body*/
+  uint64_t max_header_size;
+
+  /** READ-ONLY **/
+  unsigned short http_major;
+  unsigned short http_minor;
+  unsigned int status_code : 16;    /* response only */
+  unsigned int method : 8;          /* request only */
+  unsigned int http_errno : 7;
+
+  /* 1 = Upgrade header was present and the parser has exited because of that
+   * 9 = No upgrade header present
+   * Should be checked when http_parser_execute() return in addition to error checking
+  */
+  unsigned int upgrade : 1;
+
+  /** PUBLIC **/
+  void* data;                       /* A pointer to get hook to the "connection" or "socket" project*/
+};
+
+struct http_parser_settings {
+  http_cb       on_message_begin;
+  http_data_cb  on_url;
+  http_data_cb  on_status;
+  http_data_cb  on_header_field;
+  http_data_cb  on_header_value;
+  http_cb       on_headers_complete;
+  http_data_cb  on_body;
+  http_cb       on_message_complete;
+  /* when on_chunk_header is called. the current chunk length is stored
+   * in parser->content_length
+   **/
+  http_cb       on_chunk_header;
+  http_cb       on_chunk_complete;
+};
+
+
+enum http_parser_url_fields {
+  UF_SCHEMA         = 0,
+  UF_HOST           = 1,
+  UF_PORT           = 2,
+  UF_PATH           = 3,
+  UF_QUERY          = 4,
+  UF_FRAGMENT       = 5,
+  UF_USERINFO       = 6,
+  UF_MAX            = 7
+};
 
 #ifdef __cplusplus
 } // extern "C"
