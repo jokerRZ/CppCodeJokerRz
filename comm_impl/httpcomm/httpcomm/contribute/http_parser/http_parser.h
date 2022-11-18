@@ -88,8 +88,60 @@ enum flags {
 
 /* Map for errno-related constants */
 #define HTTP_ERRNO_MAP(XX)                                              \
-  /* No error */
-  XX(OK, )
+  /* No error */                                                        \
+  XX(OK, "success")                                                     \
+                                                                        \
+  /* Callback-related errors*/                                          \
+  XX(CB_message_begin, "the on_message_begin callback failed")          \
+  XX(CB_url, "the on_url callback failed")                              \
+  XX(CB_head_field, "the on_head_field callback failed")                \
+  XX(CB_head_value, "the on_head_value callback failed")                \
+  XX(CB_headers_complete, "the on_headers_complete callback failed")    \
+  XX(CB_body, "the on_body callback failed")                            \
+  XX(CB_message_complete, "the on_message_complete callback failed")    \
+  XX(CB_status, "the on_status callback failed")                        \
+  XX(CB_chunk_header, "the on_chunk_header callback failed")            \
+  XX(CB_chunk_complete, "the on_chunk_complete callback failed")        \
+                                                                        \
+  /* Parsing-related errors*/                                           \
+  XX(INVALID_EOF_STATE, "stream ended at unexpected time")              \
+  XX(HEADER_OVER_FLOW, "too many header bytes seen; overflow detected") \
+  XX(CLOSED_CONNECTION,                                                 \
+    "data received after completed connection: close message")          \
+  XX(INVALID_VERSION, "invalid HTTP version")                           \
+  XX(INVALID_STATUS, "invalid HTTP status code")                        \
+  XX(INVALID_METHOD, "invalid HTTP method")                             \
+  XX(INVALID_URL, "invalid URL")                                        \
+  XX(INVALID_HOST, "invalid host")                                      \
+  XX(INVALID_PORT, "invalid port")                                      \
+  XX(INVALID_PATH, "invalid path")                                      \
+  XX(INVALID_QUERY_STRING, "invalid query string")                      \
+  XX(INVALID_FRAGMENT, "invalid fragment")                              \
+  XX(LF_EXPECTED, "LF character expected")                              \
+  XX(INVALID_HEADER_TOKEN, "invalid character in header")               \
+  XX(INVALID_CONTENT_LENGTH,                                            \
+    "invalid character in content-length header")                       \
+  XX(INVALID_CHUNK_SIZE,                                                \
+    "invalid character in chunk size header")                           \
+  XX(INVALID_CONSTANT, "invalid constant string")                       \
+  XX(INVALID_INTERNAL_STATE, "ecounter unexpected internal state")      \
+  XX(STRICT, "strict mode assertion failed")                            \
+  XX(PAUSED, "parser is paused")                                        \
+  XX(UNKNOWN, "an unknown error occurred")
+
+/* Define HPE_* values for each errno value above */
+#define HTTP_ERRNO_GEN(n, s) HPE_##n,
+enum http_errno {
+  HTTP_ERRNO_MAP(HTTP_ERRNO_GEN)
+};
+#undef HTTP_ERRNO_GEN
+
+/* Get an http_errno valud from an http_parser */
+#define HTTP_PARSER_ERRNO   ((enum http_errno) (p)->http_errno)
+
+struct http_parser {
+  
+}
 
 #ifdef __cplusplus
 } // extern "C"
