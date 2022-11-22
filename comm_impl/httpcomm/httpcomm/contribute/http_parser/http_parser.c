@@ -1,6 +1,12 @@
 #include "http_parser.h"
 
+
+
+
+
 #define CURRENT_STATE() p_state
+
+#define UPDATE_STATE(V) p_state = (enum state) (V)
 
 enum state {
   s_dead = 1,           /* import that this is > 0 */
@@ -23,7 +29,9 @@ enum state {
 
   s_start_req,
 
-  s_req_method
+  s_req_method,
+
+  s_body_identity_eof
 };
 
 #define PARSING_HEADER(state) (state <= s_headers_done)
@@ -49,7 +57,7 @@ size_t http_parser_execute(http_parser* parser,
 
   if (len == 0) {
     switch (CURRENT_STATE()) {
-      case 
+      case s_body_identity_eof:
     }
   }
 }
