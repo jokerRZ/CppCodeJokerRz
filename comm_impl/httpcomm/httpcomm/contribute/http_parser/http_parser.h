@@ -137,7 +137,7 @@ enum http_errno {
 #undef HTTP_ERRNO_GEN
 
 /* Get an http_errno valud from an http_parser */
-#define HTTP_PARSER_ERRNO   ((enum http_errno) (p)->http_errno)
+#define HTTP_PARSER_ERRNO(p)   ((enum http_errno) (p)->http_errno)
 
 struct http_parser {
   /** PRIVATE **/
